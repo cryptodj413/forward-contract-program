@@ -1,0 +1,16 @@
+[features]
+resolution = false
+skip-lint = false
+
+[programs.localnet]
+forward = "H9nMjNj9hCHiZHZdAaafv3meN8uXx27AeUc8PpddhYsw"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Devnet"
+wallet = "~/.config/solana/id.json"
+
+[test]
+startup_wait = 10000
