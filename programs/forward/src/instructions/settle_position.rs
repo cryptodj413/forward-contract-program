@@ -23,7 +23,11 @@ pub struct SettlePosition<'info> {
     )]
     pub pool_state: Account<'info, crate::state::PoolState>,
     
-    /// CHECK: Resolution oracle account
+    #[account(
+        mut,
+        seeds = [b"resolution_oracle", market_config.key().as_ref()],
+        bump
+    )]
     pub resolution_oracle: Account<'info, crate::oracle::ResolutionOracle>,
     
     #[account(

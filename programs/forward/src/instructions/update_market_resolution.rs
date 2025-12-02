@@ -14,7 +14,11 @@ pub struct UpdateMarketResolution<'info> {
     )]
     pub market_config: Account<'info, crate::state::MarketConfig>,
     
-    /// CHECK: Resolution oracle account
+    #[account(
+        mut,
+        seeds = [b"resolution_oracle", market_config.key().as_ref()],
+        bump
+    )]
     pub resolution_oracle: Account<'info, crate::oracle::ResolutionOracle>,
 }
 
@@ -29,9 +33,10 @@ pub fn handler(
         ForwardError::InvalidMarketStatus
     );
     
-    // In production, you'd verify the outcome matches the oracle
-    // For now, we accept the keeper's input but could add validation
-    
+    // Persist outcome in the per‑market resolution oracle PDA
+    ctx.accounts.resolution_oracle.outcome = Some(outcome.as_u8());
+    ctx.accounts.resolution_oracle.resolved_at = Some(Clock::get()?.unix_timestamp);
+
     market_config.status = MarketStatus::Resolved;
     
     msg!("Market resolved with outcome: {:?}", outcome);

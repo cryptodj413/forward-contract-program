@@ -30,7 +30,11 @@ pub struct OpenPosition<'info> {
     )]
     pub pool_state: Account<'info, crate::state::PoolState>,
     
-    /// CHECK: Price oracle account
+    #[account(
+        mut,
+        seeds = [b"price_oracle", market_config.key().as_ref()],
+        bump
+    )]
     pub price_oracle: Account<'info, crate::oracle::PriceOracle>,
     
     #[account(

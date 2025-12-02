@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, Token, TokenAccount};
 use crate::state::{MarketConfig, PoolState, RiskLimits, MarketStatus};
+use crate::oracle::{PriceOracle, ResolutionOracle};
 
 #[derive(Accounts)]
 #[instruction(polymarket_market_id: String, resolution_timestamp: i64)]
@@ -33,11 +34,23 @@ pub struct CreateMarket<'info> {
     )]
     pub pool_state: Account<'info, PoolState>,
     
-    /// CHECK: Price oracle account (e.g., Pyth or custom Polymarket oracle)
-    pub price_oracle: AccountInfo<'info>,
+    #[account(
+        init,
+        payer = admin,
+        space = PriceOracle::LEN,
+        seeds = [b"price_oracle", market_config.key().as_ref()],
+        bump
+    )]
+    pub price_oracle: Account<'info, PriceOracle>,
     
-    /// CHECK: Resolution oracle account
-    pub resolution_oracle: AccountInfo<'info>,
+    #[account(
+        init,
+        payer = admin,
+        space = ResolutionOracle::LEN,
+        seeds = [b"resolution_oracle", market_config.key().as_ref()],
+        bump
+    )]
+    pub resolution_oracle: Account<'info, ResolutionOracle>,
     
     pub mint: Account<'info, Mint>,
     
@@ -76,6 +89,7 @@ pub fn handler(
     
     market_config.polymarket_market_id = polymarket_market_id.clone();
     market_config.resolution_timestamp = resolution_timestamp;
+    // Store the PDAs of the per‑market oracle accounts
     market_config.price_oracle = ctx.accounts.price_oracle.key();
     market_config.resolution_oracle = ctx.accounts.resolution_oracle.key();
     market_config.risk_limits = risk_limits;
