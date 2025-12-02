@@ -69,5 +69,14 @@ pub mod forward {
     ) -> Result<()> {
         instructions::update_market_resolution::handler(ctx, outcome)
     }
+
+    /// Update price oracle with current Polymarket price (keeper function)
+    pub fn update_price_oracle(
+        ctx: Context<UpdatePriceOracle>,
+        price: u64,
+        exponent: i8,
+    ) -> Result<()> {
+        instructions::update_price_oracle::handler(ctx, price, exponent)
+    }
 }
 

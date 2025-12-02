@@ -5,6 +5,7 @@ pub mod close_market_for_trading;
 pub mod open_position;
 pub mod settle_position;
 pub mod update_market_resolution;
+pub mod update_price_oracle;
 
 // Suppress ambiguous glob re-exports warning - each module has a handler function
 // but they're only used via explicit paths in lib.rs, so the ambiguity is harmless
@@ -22,4 +23,6 @@ pub use open_position::*;
 pub use settle_position::*;
 #[allow(ambiguous_glob_reexports)]
 pub use update_market_resolution::*;
+#[allow(ambiguous_glob_reexports)]
+pub use update_price_oracle::*;
 
