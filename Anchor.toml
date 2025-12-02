@@ -3,7 +3,7 @@ resolution = false
 skip-lint = false
 
 [programs.localnet]
-forward = "H9nMjNj9hCHiZHZdAaafv3meN8uXx27AeUc8PpddhYsw"
+forward = "BwMMU9rwkXmLdTL5VLBRwkinri2wW1J6pnwTsVv8PvY9"
 
 [registry]
 url = "https://api.apr.dev"

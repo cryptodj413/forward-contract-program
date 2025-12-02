@@ -10,7 +10,7 @@ pub mod state;
 
 use instructions::*;
 
-declare_id!("H9nMjNj9hCHiZHZdAaafv3meN8uXx27AeUc8PpddhYsw");
+declare_id!("BwMMU9rwkXmLdTL5VLBRwkinri2wW1J6pnwTsVv8PvY9");
 
 #[program]
 pub mod forward {
