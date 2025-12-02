@@ -40,6 +40,11 @@ pub fn handler(
         ForwardError::InvalidMarketStatus
     );
     
+    require!(
+        market_config.status != MarketStatus::Resolved,
+        ForwardError::MarketAlreadyResolved
+    );
+    
     // Persist outcome in the per‑market resolution oracle PDA
     ctx.accounts.resolution_oracle.outcome = Some(outcome.as_u8());
     ctx.accounts.resolution_oracle.resolved_at = Some(Clock::get()?.unix_timestamp);

@@ -101,7 +101,6 @@ pub enum MarketStatus {
     Active,
     TradingClosed,
     Resolved,
-    Cancelled,
 }
 
 /// Position direction

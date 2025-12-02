@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::errors::ForwardError;
+use crate::math::BASIS_POINTS;
 
 /// Oracle price feed account structure
 /// This is a simplified structure - in production, you'd integrate with
@@ -28,7 +29,28 @@ impl ResolutionOracle {
 
 /// Read price from oracle account
 pub fn read_price(oracle_account: &Account<PriceOracle>) -> Result<u64> {
-    // In production, add validation for timestamp freshness
+    // Validate price is within valid range [0, BASIS_POINTS]
+    require!(
+        oracle_account.price <= BASIS_POINTS,
+        ForwardError::InvalidOracleData
+    );
+    
+    // Validate timestamp freshness (price must be < 5 minutes old and not in future)
+    let clock = Clock::get()?;
+    let max_age: i64 = 300; // 5 minutes in seconds
+    
+    // Reject if timestamp is in the future
+    require!(
+        oracle_account.timestamp <= clock.unix_timestamp,
+        ForwardError::InvalidOracleData
+    );
+    
+    // Reject if timestamp is too old
+    require!(
+        clock.unix_timestamp.saturating_sub(oracle_account.timestamp) <= max_age,
+        ForwardError::InvalidOracleData
+    );
+    
     Ok(oracle_account.price)
 }
 

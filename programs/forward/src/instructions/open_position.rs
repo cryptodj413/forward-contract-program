@@ -46,7 +46,8 @@ pub struct OpenPosition<'info> {
     
     #[account(
         mut,
-        constraint = user_collateral_account.owner == user.key()
+        constraint = user_collateral_account.owner == user.key(),
+        constraint = user_collateral_account.mint == global_config.collateral_mint @ ForwardError::InvalidMint
     )]
     pub user_collateral_account: Account<'info, TokenAccount>,
     
@@ -89,6 +90,11 @@ pub fn handler(
     
     // Check slippage if provided
     if let Some(slippage) = slippage_tolerance {
+        require!(
+            slippage <= BASIS_POINTS,
+            ForwardError::InvalidOracleData
+        );
+        
         let price_diff = if forward_price > polymarket_price {
             forward_price - polymarket_price
         } else {

@@ -83,6 +83,18 @@ pub fn handler(
         ctx.accounts.mint.key() == ctx.accounts.global_config.collateral_mint,
         crate::errors::ForwardError::InvalidMint
     );
+    
+    // Validate resolution timestamp is in the future but not too far
+    let clock = Clock::get()?;
+    require!(
+        resolution_timestamp > clock.unix_timestamp,
+        crate::errors::ForwardError::InvalidOracleData
+    );
+    // Max 10 years in the future
+    require!(
+        resolution_timestamp <= clock.unix_timestamp.saturating_add(315360000),
+        crate::errors::ForwardError::InvalidOracleData
+    );
 
     // Validate per‑market risk limits against ARCHITECTURE.md:
     // max_total_exposure > 0 and shares are fractions in basis points (0..=BASIS_POINTS).

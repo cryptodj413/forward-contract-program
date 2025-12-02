@@ -47,7 +47,8 @@ pub struct SettlePosition<'info> {
     
     #[account(
         mut,
-        constraint = user_collateral_account.owner == user.key()
+        constraint = user_collateral_account.owner == user.key(),
+        constraint = user_collateral_account.mint == collateral_vault.mint @ ForwardError::InvalidMint
     )]
     pub user_collateral_account: Account<'info, TokenAccount>,
     
@@ -82,6 +83,11 @@ pub fn handler(ctx: Context<SettlePosition>) -> Result<()> {
     
     // Transfer payout to user
     if payout > 0 {
+        require!(
+            ctx.accounts.collateral_vault.amount >= payout,
+            ForwardError::InsufficientCollateral
+        );
+        
         let market_config_key = ctx.accounts.market_config.key();
         let seeds = &[
             b"collateral_vault",
