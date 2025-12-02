@@ -83,6 +83,21 @@ pub fn handler(
         ctx.accounts.mint.key() == ctx.accounts.global_config.collateral_mint,
         crate::errors::ForwardError::InvalidMint
     );
+
+    // Validate per‑market risk limits against ARCHITECTURE.md:
+    // max_total_exposure > 0 and shares are fractions in basis points (0..=BASIS_POINTS).
+    require!(
+        risk_limits.max_total_exposure > 0,
+        crate::errors::ForwardError::InvalidOracleData
+    );
+    require!(
+        risk_limits.max_long_share <= crate::math::BASIS_POINTS,
+        crate::errors::ForwardError::InvalidOracleData
+    );
+    require!(
+        risk_limits.max_short_share <= crate::math::BASIS_POINTS,
+        crate::errors::ForwardError::InvalidOracleData
+    );
     
     let market_config = &mut ctx.accounts.market_config;
     let pool_state = &mut ctx.accounts.pool_state;

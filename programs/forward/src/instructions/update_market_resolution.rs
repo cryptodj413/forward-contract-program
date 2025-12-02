@@ -4,8 +4,15 @@ use crate::errors::ForwardError;
 
 #[derive(Accounts)]
 pub struct UpdateMarketResolution<'info> {
-    /// CHECK: Keeper or admin (can be same as admin or separate)
-    pub keeper: Signer<'info>,
+    #[account(mut)]
+    pub admin: Signer<'info>,
+    
+    #[account(
+        seeds = [b"global_config"],
+        bump = global_config.bump,
+        has_one = admin @ ForwardError::Unauthorized
+    )]
+    pub global_config: Account<'info, crate::state::GlobalConfig>,
     
     #[account(
         mut,

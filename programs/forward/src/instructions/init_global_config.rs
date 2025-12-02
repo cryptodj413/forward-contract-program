@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::state::{GlobalConfig, CurveParams};
+use crate::math::BASIS_POINTS;
+use crate::errors::ForwardError;
 
 #[derive(Accounts)]
 pub struct InitGlobalConfig<'info> {
@@ -25,6 +27,20 @@ pub fn handler(
     ctx: Context<InitGlobalConfig>,
     curve_params: CurveParams,
 ) -> Result<()> {
+    // Validate curve parameters against ARCHITECTURE.md:
+    // 0 <= p_min <= p_max <= 1 (in basis points) and non‑degenerate exposure.
+    require!(
+        curve_params.min_price <= curve_params.max_price,
+        ForwardError::InvalidOracleData
+    );
+    require!(
+        curve_params.max_price <= BASIS_POINTS,
+        ForwardError::InvalidOracleData
+    );
+    require!(
+        curve_params.max_exposure > 0,
+        ForwardError::InvalidOracleData
+    );
     let global_config = &mut ctx.accounts.global_config;
     
     global_config.admin = ctx.accounts.admin.key();

@@ -78,6 +78,7 @@ pub fn handler(
     
     // Read Polymarket price from oracle
     let polymarket_price = oracle::read_price(&ctx.accounts.price_oracle)?;
+    require!(polymarket_price > 0, ForwardError::InvalidOracleData);
     
     // Calculate forward price K using pAMM curve
     let forward_price = math::calculate_forward_price(
